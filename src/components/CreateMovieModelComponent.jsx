@@ -1,4 +1,5 @@
 import { Modal } from "react-bootstrap";
+import EditMovieComponent from "./EditMovieComponent";
 
 const CreateMovieModelComponent = (props) => {
 
@@ -11,7 +12,7 @@ const CreateMovieModelComponent = (props) => {
         </Modal.Header>
 
         <Modal.Body>
-          <div>this is body</div>
+          <EditMovieComponent />
         </Modal.Body>
       </Modal>
     </>
