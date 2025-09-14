@@ -1,38 +1,39 @@
 import { useEffect, useState } from "react";
-import MovieItem from "./MovieItemComponent";
 import ReactPaginate from "react-paginate";
+import { Button, Col, Row } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
-const MovieListComponent = () => {
-
-  const [movies, setMovies] = useState(null);
-  const [moviesCount, setMoviesCount] = useState(0);
+const ActorListComponent = () => {
+  const [actors, setActors] = useState(null);
+  const [actorsCount, setActorsCount] = useState(0);
   const [page, setPage] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    //Get all movies
-    getMovies();
+    //Get all actors
+    getPersons();
   }, [page]);
 
-  const getMovies = () => {
+  const getPersons = () => {
     const API_URL = import.meta.env.VITE_API_URL;
     const PAGE_SIZE = import.meta.env.VITE_PAGING_SIZE;
 
-    fetch(API_URL + "/movie?pageSize=" + PAGE_SIZE + "&pageIndex=" + page)
+    fetch(API_URL + "/person?pageSize=" + PAGE_SIZE + "&pageIndex=" + page)
       .then(res => res.json())
       .then(res => {
         if (res.status === true && res.data.count > 0) {
-          setMovies(res.data.movies);
-          setMoviesCount(Math.ceil(res.data.count / PAGE_SIZE));
+          setActors(res.data.persons);
+          setActorsCount(Math.ceil(res.data.count / PAGE_SIZE));
         }
         else if (res.data.count === 0) {
-          alert("There is no movie data in the system.");
+          alert("There is no actor data in the system.");
         }
       })
-      .catch(err => alert("Error while fetching movie data."));
+      .catch(err => alert("Error while fetching actor data."));
   }
 
-  const deleteMovie = (id) => {
-    fetch(import.meta.env.VITE_API_URL + "/Movie?id=" + id, {
+  const deletePerson = (id) => {
+    fetch(import.meta.env.VITE_API_URL + "/Person?id=" + id, {
       method: "DELETE",
       headers: {
         'Accept': 'application/json',
@@ -43,10 +44,10 @@ const MovieListComponent = () => {
       .then(res => {
         if (res.status === true) {
           alert(res.message);
-          getMovies();
+          getPersons();
         }
       })
-      .catch(err => alert("Error in deleting movie."));
+      .catch(err => alert("Error in deleting actor."));
   }
 
   const handlePageClick = (pageIndex) => {
@@ -54,8 +55,17 @@ const MovieListComponent = () => {
   }
   return (
     <>
-      {movies && movies.length > 0
-        ? movies.map((m, i) => <MovieItem key={i} data={m} deleteMovie={deleteMovie} />)
+      {actors
+        ? <div> {actors.map((m, i) =>
+          <Row key={i}>
+            <Col>
+              <div onClick={() => navigate(`/actors/details/${m.id}`)}><b><u>{m.name}</u></b></div>
+              <Button onClick={() => navigate(`/actors/create-edit/${m.id}`)}>Edit</Button>{' '}
+              <Button variant="danger" onClick={() => deletePerson(m.id)}>Delete</Button>
+              <hr />
+            </Col>
+          </Row>)}
+        </div>
         : ""}
       <div className="d-flex justify-content-center">
         <ReactPaginate
@@ -63,7 +73,7 @@ const MovieListComponent = () => {
           nextLabel={'next'}
           breakLabel={'...'}
           breakClassName={'page-link'}
-          pageCount={moviesCount}
+          pageCount={actorsCount}
           marginPagesDisplayed={2}
           pageRangeDisplayed={5}
           onPageChange={handlePageClick}
@@ -80,4 +90,4 @@ const MovieListComponent = () => {
 }
 
 
-export default MovieListComponent;
+export default ActorListComponent;

@@ -1,13 +1,33 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Form, Image } from "react-bootstrap";
 import NoImage from '../no-image.png';
 import AsyncSelect from "react-select/async";
+import { useParams } from "react-router-dom";
 
 const EditMovieComponent = () => {
-
+  const { movieid } = useParams();
   const [movie, setMovie] = useState({});
   const [actors, setActors] = useState(null);
   const [validated, setvalidated] = useState(false);
+
+  useEffect(() => {
+    if (movieid !== undefined) {
+      fetch(import.meta.env.VITE_API_URL + "/movie/" + movieid)
+        .then(res => res.json())
+        .then(res => {
+          if (res.status === true) {
+            let movieData = res.data;
+            if (movieData.releaseDate != null && movieData.releaseDate != undefined) {
+              movieData.releaseDate = movieData.releaseDate.split('T')[0];
+            }
+            setMovie(movieData);
+            setActors(movieData.actors.map(x => { return { value: x.id, label: x.name } }))
+          }
+        })
+        .catch(err => alert("Error in getting data."));
+    }
+  }, []);
+
 
   const handleFileUpload = (event) => {
     event.preventDefault();
@@ -40,17 +60,17 @@ const EditMovieComponent = () => {
     });
   }
 
-  const promiseOptions = (inputValue) => {
-    return fetch(import.meta.env.VITE_API_URL + "/Person/Search/" + inputValue)
-      .then(res => res.json())
-      .then(res => {
-        if (res.data.count === 0) {
-          alert("There is no actor matching with this name.")
-        }
-
-        return res.data.map(x => { return { value: x.id, label: x.name } })
-      })
-      .catch(err => alert("Error in getting data."));
+  const promiseOptions = async (inputValue) => {
+    try {
+      const res = await fetch(import.meta.env.VITE_API_URL + "/Person/Search/" + inputValue);
+      const res_1 = await res.json();
+      if (res_1.data.count === 0) {
+        alert("There is no actor matching with this name.");
+      }
+      return res_1.data.map(x => { return { value: x.id, label: x.name }; });
+    } catch (err) {
+      return alert("Error in getting data.");
+    }
   }
 
   const multiselectchange = (data) => {
@@ -95,8 +115,12 @@ const EditMovieComponent = () => {
         .then(res => res.json())
         .then(res => {
           if (res.status === true && res.data) {
-            setMovie(res.data);
-            alert("Movie updated successfully.")
+            let movieData = res.data;
+            if (movieData.releaseDate != null && movieData.releaseDate != undefined) {
+              movieData.releaseDate = movieData.releaseDate.split('T')[0];
+            }
+            setMovie(movieData);
+            alert("Movie updated successfully.");
           }
         })
         .catch(err => alert("Error updating movie."));
@@ -114,11 +138,15 @@ const EditMovieComponent = () => {
         .then(res => res.json())
         .then(res => {
           if (res.status === true && res.data) {
-            setMovie(res.data);
-            alert("Movie Created successfully.")
+            let movieData = res.data;
+            if (movieData.releaseDate != null && movieData.releaseDate != undefined) {
+              movieData.releaseDate = movieData.releaseDate.split('T')[0];
+            }
+            setMovie(movieData);
+            alert("Movie Created successfully.");
           }
         })
-        .catch(err => alert("Error updating movie."));
+        .catch(err => alert("Error creating movie."));
     }
   }
 

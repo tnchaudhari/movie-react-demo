@@ -2,8 +2,12 @@ import { BrowserRouter, Link, Routes, Route } from 'react-router-dom'
 import './App.css'
 import { Nav, Navbar, Container } from 'react-bootstrap'  // Recommended to use Container inside Navbar
 import HomeComponent from './components/HomeComponent'
-import ActorComponent from './components/ActorComponent'
 import 'bootstrap/dist/css/bootstrap.min.css'
+import EditMovieComponent from './components/EditMovieComponent'
+import MovieDetailComponent from './components/MovieDetailComponent'
+import ActorsComponent from './components/ActorsComponent'
+import ActorDetailComponent from './components/ActorDetailComponent'
+import CreateEditActorComponent from './components/CreateEditActorComponent'
 
 function App() {
   return (
@@ -20,7 +24,11 @@ function App() {
 
       <Routes>
         <Route path='/' element={<HomeComponent />} />
-        <Route path='/actors' element={<ActorComponent />} />
+        <Route path='/details/:movieid' element={<MovieDetailComponent />} />
+        <Route path='/edit/:movieid' element={<EditMovieComponent />} />
+        <Route path='/actors' element={<ActorsComponent />} />
+        <Route path='/actors/create-edit' element={<CreateEditActorComponent />} />
+        <Route path='/actors/details/:actorid' element={<ActorDetailComponent />} />
       </Routes>
     </BrowserRouter>
   )
